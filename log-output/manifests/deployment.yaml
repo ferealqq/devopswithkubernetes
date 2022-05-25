@@ -12,6 +12,17 @@ spec:
       labels:
         app: logoutput
     spec:
+      volumes: # Define volume
+        - name: shared-image
+          emptyDir: {}
       containers:
         - name: logoutput
-          image: pekkamattinen/logoutput
+          image: pekkamattinen/logoutput:07
+          volumeMounts:
+            - name: shared-image
+              mountPath: /opt/app/files
+        - name: logreader
+          image: pekkamattinen/logreader
+          volumeMounts:
+            - name: shared-image
+              mountPath: /opt/app/files

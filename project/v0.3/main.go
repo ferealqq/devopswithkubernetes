@@ -10,7 +10,7 @@ import (
 
 var (
 	port    = os.Getenv("PORT")
-	version = "0.01"
+	version = "0.03"
 )
 
 
@@ -28,5 +28,5 @@ func main(){
 	startupMessage = startupMessage + " on port " + port
 	log.Println(startupMessage)
 
-	n.Run("localhost:" + port)
+	n.Run(":"+port)
 }

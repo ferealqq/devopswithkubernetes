@@ -14,15 +14,16 @@ spec:
     spec:
       volumes: # Define volume
         - name: shared-image
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: logoutput-claim
       containers:
         - name: logoutput
-          image: pekkamattinen/logoutput:07
+          image: pekkamattinen/logoutput:092
           volumeMounts:
             - name: shared-image
               mountPath: /opt/app/files
         - name: logreader
-          image: pekkamattinen/logreader
+          image: pekkamattinen/logreader:02
           volumeMounts:
             - name: shared-image
               mountPath: /opt/app/files

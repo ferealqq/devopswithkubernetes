@@ -12,6 +12,13 @@ spec:
       labels:
         app: pingpong
     spec:
+      volumes: # Define volume
+        - name: shared-image
+          persistentVolumeClaim:
+            claimName: logoutput-claim
       containers:
         - name: pingpong
-          image: pekkamattinen/pingpong
+          image: pekkamattinen/pingpong:03
+          volumeMounts:
+            - name: shared-image
+              mountPath: /opt/app/files

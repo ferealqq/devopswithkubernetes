@@ -18,7 +18,7 @@ spec:
             claimName: image-claim
       containers:
         - name: project
-          image: pekkamattinen/project:007
+          image: pekkamattinen/project:0072
           volumeMounts:
             - mountPath: /opt/app/images
               name: shared-image

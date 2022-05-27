@@ -2,6 +2,9 @@ FROM golang:1.18-alpine as build
 
 WORKDIR /app
 
+RUN apk --update add --no-cache ca-certificates openssl git tzdata && \
+update-ca-certificates
+
 COPY . ./
 RUN go mod download
 
@@ -11,6 +14,8 @@ RUN ./build_wasm
 FROM scratch as runner 
 COPY --from=build /app/server /opt/app/server
 COPY --from=build /app/static /opt/app/static
+# To enable downloading a image from the https://picsum.photos/1200
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 WORKDIR /opt/app
 

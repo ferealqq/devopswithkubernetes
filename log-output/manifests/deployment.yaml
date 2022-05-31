@@ -18,12 +18,15 @@ spec:
             claimName: logoutput-claim
       containers:
         - name: logoutput
-          image: pekkamattinen/logoutput:092
+          image: pekkamattinen/logoutput:12
           volumeMounts:
             - name: shared-image
               mountPath: /opt/app/files
         - name: logreader
-          image: pekkamattinen/logreader:02
+          image: pekkamattinen/logreader:04
           volumeMounts:
             - name: shared-image
               mountPath: /opt/app/files
+          env:
+          - name: PINGPONG_PORT
+            value: "2346"

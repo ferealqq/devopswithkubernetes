@@ -12,6 +12,7 @@ import (
 const cStr = "Ping / Pongs: "
 const file = "files/log.txt"
 
+// Depricated
 func readFile() (string, error) {
 	if b, err := os.ReadFile(file); err == nil {
 		return bytes.NewBuffer(b).String(), nil
@@ -19,7 +20,7 @@ func readFile() (string, error) {
 		return "", err
 	}
 }
-
+// Depricated
 func writeCount() (string, error) {
 	if str, err := readFile(); err == nil {
 		arr := strings.Split(str,cStr)
@@ -44,15 +45,26 @@ func writeCount() (string, error) {
 }
 
 
-func main(){
-	http.HandleFunc("/pingpong", func(w http.ResponseWriter, r *http.Request){
-		if c, e := writeCount(); e != nil {
-			http.Error(w, e.Error(), http.StatusInternalServerError)
-			return
-		}else {
-			http.ServeContent(w,r,"kontsaa",time.Now(),bytes.NewReader([]byte(c)))
-		}
-	})	
+func getEnv(key, fallback string) string {
+    if value, ok := os.LookupEnv(key); ok {
+        return value
+    }
+    return fallback
+}
 
-	http.ListenAndServe(":3001", nil)
+func main(){
+	count := 0
+	http.HandleFunc("/pingpong", func(w http.ResponseWriter, r *http.Request){
+		count++
+
+		c := cStr+strconv.Itoa(count)
+	
+		http.ServeContent(w,r,"kontsaa", time.Now(), bytes.NewReader([]byte(c)))
+	})
+	
+	http.HandleFunc("/pingpong/count", func(w http.ResponseWriter, r *http.Request){
+		http.ServeContent(w,r,"count", time.Now(), bytes.NewReader([]byte(strconv.Itoa(count))))
+	});
+
+	http.ListenAndServe(":"+getEnv("PORT", "3001"), nil)
 }

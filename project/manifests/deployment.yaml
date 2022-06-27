@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: project
+  template:
+    metadata:
+      labels:
+        app: project
+    spec:
+      volumes:
+        - name: shared-image
+          persistentVolumeClaim:
+            claimName: image-claim
+      containers:
+        - name: project
+          image: pekkamattinen/project:0072
+          volumeMounts:
+            - mountPath: /opt/app/images
+              name: shared-image
+          env:
+            - name: SERVICE
+              value: "project-api"
+            - name: SERVICE_PORT
+              value: "2346"
+
+        - name: project-api
+          image: pekkamattinen/api-project:01
+          env:
+            - name: PORT
+              value: "4000"

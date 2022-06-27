@@ -1,0 +1,29 @@
+FROM golang:1.18-alpine as build
+
+WORKDIR /app
+
+RUN apk --update add --no-cache ca-certificates openssl git tzdata && \
+update-ca-certificates
+
+COPY go.mod ./
+COPY go.sum ./
+COPY back ./back
+COPY pkg ./pkg
+
+RUN go mod download
+
+WORKDIR /app/back
+
+RUN CGO_ENABLED=0 go build . 
+
+FROM scratch as runner 
+COPY --from=build /app/back/back /opt/app/back
+copy --from=build /app/back/images /opt/app/images
+# To enable downloading a image from the https://picsum.photos/1200
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+WORKDIR /opt/app
+
+ENV GIN_MODE=release
+
+CMD [ "./back" ]

@@ -1,9 +1,0 @@
-cd frontti 
-dest_dir=./../static
-dest_wasm="$dest_dir/app.wasm"
-wasm_js="$(go env GOROOT)/misc/wasm/wasm_exec.js"
-cp $wasm_js "$dest_dir/"
-echo "$wasm_js copied to $dest_dir"
-GOOS=js GOARCH=wasm GO111MODULE=on go build -o $dest_wasm . 
-echo "$dest_wasm built"
-cd ..  

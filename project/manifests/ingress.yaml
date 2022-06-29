@@ -17,7 +17,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: project-api
+            name: project-api-svc
             port:
               number: 2346
         

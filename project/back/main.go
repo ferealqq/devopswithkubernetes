@@ -58,12 +58,13 @@ func main(){
 	var todos []*models.Todo
 	todos = append(todos, models.CreateTodo("Exercise 1.12"), models.CreateTodo("Exrcise 1.13"))
 	router := gin.Default()
+	router.Use(util.CORSMiddleware())
 	// this could and should be don with a cron job but we haven't figured out that part yet about kubernetes
 	go saveTodayImage()
-	router.GET("/todos", func(c *gin.Context){
+	router.GET("/api/todos", func(c *gin.Context){
 		c.JSON(200, todos)
 	})
-	router.POST("/todos", func(c *gin.Context){
+	router.POST("/api/todos", func(c *gin.Context){
 		var todo *models.Todo
 		if err := c.BindJSON(&todo); err != nil {
 			c.JSON(500, err.Error())

@@ -1,10 +1,12 @@
-package front
+package main
 
 import (
 	"io"
 	"net/http"
 	"os"
 	"time"
+
+	"project-todo/pkg/util"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -51,6 +53,8 @@ func saveTodayImage(){
 
 func main(){
 	router := gin.Default()
+	router.Use(util.CORSMiddleware())
+
 	// this could and should be don with a cron job but we haven't figured out that part yet about kubernetes
 	go saveTodayImage()
 	router.StaticFile("/","static/index.html")

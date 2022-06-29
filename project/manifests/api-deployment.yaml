@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project-api-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: project-api
+  template:
+    metadata:
+      labels:
+        app: project-api
+    spec:
+      volumes:
+        - name: shared-image
+          persistentVolumeClaim:
+            claimName: image-claim
+      containers:
+        - name: project-api
+          image: pekkamattinen/api-project:014
+          env:
+            - name: PORT
+              value: "4000"

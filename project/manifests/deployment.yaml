@@ -18,18 +18,14 @@ spec:
             claimName: image-claim
       containers:
         - name: project
-          image: pekkamattinen/project:0072
+          image: pekkamattinen/project:016
           volumeMounts:
             - mountPath: /opt/app/images
               name: shared-image
           env:
             - name: SERVICE
-              value: "project-api"
+              value: "project-api-svc"
             - name: SERVICE_PORT
               value: "2346"
-
-        - name: project-api
-          image: pekkamattinen/api-project:01
-          env:
             - name: PORT
-              value: "4000"
+              value: "3000"

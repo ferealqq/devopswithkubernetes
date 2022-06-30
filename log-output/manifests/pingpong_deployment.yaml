@@ -19,10 +19,12 @@ spec:
       #       claimName: logoutput-claim
       containers:
         - name: pingpong
-          image: pekkamattinen/pingpong:06
+          image: pekkamattinen/pingpong:07
           env:
             - name: "PORT"
               value: "3001"
+            - name: CONNECTION
+              value: "host=psql-svc database=ping user=this password=this sslmode=disable"
           # volumeMounts:
           #   - name: shared-image
           #     mountPath: /opt/app/files

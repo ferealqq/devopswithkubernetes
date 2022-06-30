@@ -2,48 +2,15 @@ package main
 
 import (
 	"bytes"
+	"database/sql"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 	"time"
+
+	_ "github.com/lib/pq"
 )
-
-const cStr = "Ping / Pongs: "
-const file = "files/log.txt"
-
-// Depricated
-func readFile() (string, error) {
-	if b, err := os.ReadFile(file); err == nil {
-		return bytes.NewBuffer(b).String(), nil
-	} else {
-		return "", err
-	}
-}
-// Depricated
-func writeCount() (string, error) {
-	if str, err := readFile(); err == nil {
-		arr := strings.Split(str,cStr)
-		var s string
-		if len(arr) > 1 { 
-			cs := arr[len(arr)-1]
-			if c, e := strconv.Atoi(cs); e == nil {
-				s = arr[0]+cStr+strconv.Itoa(c+1)
-			} else {
-				return "", e
-			}
-		} else {
-			s = cStr+"1"
-		}
-		return s, os.WriteFile(file, []byte(s), 0644)
-	} else if os.IsNotExist(err) {
-		s := cStr+"1"
-		return s, os.WriteFile(file, []byte(s), 0644)
-	} else {
-		return "", err
-	}
-}
-
 
 func getEnv(key, fallback string) string {
     if value, ok := os.LookupEnv(key); ok {
@@ -52,19 +19,81 @@ func getEnv(key, fallback string) string {
     return fallback
 }
 
-func main(){
-	count := 0
-	http.HandleFunc("/pingpong", func(w http.ResponseWriter, r *http.Request){
-		count++
 
-		c := cStr+strconv.Itoa(count)
+const cStr = "Ping / Pongs: "
+
+var sConn = getEnv("CONNECTION","host=localhost user=this password=this sslmode=disable")
+
+var db *sql.DB
+
+func increase() (int,error){
+	if db != nil {
+		var c int 
+		err := db.QueryRow("update counter set n = n + 1 where id = 1 returning n").Scan(&c);
+		if err != nil{
+			return 0, err 
+		}
+
+		return c, nil
+	}
+	// fixme return a error
+	return 0,nil
+}
+
+func count() (int, error){
+	if db != nil {
+		var c int 
+		err := db.QueryRow("select n from counter where id = 1 limit 1;").Scan(&c);
+		if err != nil{
+			return 0, err 
+		}
+
+		return c, nil
+	}
+	// fixme return a error
+	return 0,nil
+}
+
+func initCounter() {
+	q := "insert into counter (id,n)"+
+		 "select 1, 0 "+
+		 "where not exists ( "+
+			"select id from counter where id = 1"+
+		 ");"	
+
+	if _,err := db.Query(q); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func main(){
+	conn, err := sql.Open("postgres",sConn)
+	if err == nil {
+		db = conn
+		initCounter()
+	}else{
+		panic(err)
+	}
+
+	http.HandleFunc("/pingpong", func(w http.ResponseWriter, r *http.Request){
+		if count, err := increase(); err == nil {
+			c := cStr+strconv.Itoa(count)
 	
-		http.ServeContent(w,r,"kontsaa", time.Now(), bytes.NewReader([]byte(c)))
+			http.ServeContent(w,r,"kontsaa", time.Now(), bytes.NewReader([]byte(c)))
+		}else{
+			log.Fatal(err)
+			http.ServeContent(w,r,"k",time.Now(), bytes.NewReader([]byte("something went wrong, try again later")))
+		}
 	})
 	
 	http.HandleFunc("/pingpong/count", func(w http.ResponseWriter, r *http.Request){
-		http.ServeContent(w,r,"count", time.Now(), bytes.NewReader([]byte(strconv.Itoa(count))))
+		if count, err := count(); err == nil {
+			http.ServeContent(w,r,"count", time.Now(), bytes.NewReader([]byte(strconv.Itoa(count))))
+		}else{
+			log.Fatal(err)
+			http.ServeContent(w,r,"count", time.Now(), bytes.NewReader([]byte(strconv.Itoa(0))))
+		}
 	});
 
-	http.ListenAndServe(":"+getEnv("PORT", "3001"), nil)
+	log.Fatal(http.ListenAndServe(":"+getEnv("PORT", "3001"), nil))
 }

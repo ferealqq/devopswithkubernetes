@@ -3,8 +3,5 @@ data:
   MESSAGE: Hello
 kind: ConfigMap
 metadata:
-  creationTimestamp: "2022-06-30T13:48:06Z"
   name: log-map
   namespace: logoutput
-  resourceVersion: "778652"
-  uid: 12d9823c-2dfd-48f0-8a89-31cd9f35ed34

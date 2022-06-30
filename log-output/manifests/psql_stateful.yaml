@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: psql-ss
+  namespace: logoutput
+spec:
+  serviceName: psql-svc
+  replicas: 2
+  selector:
+    matchLabels:
+      app: psqlapp
+  template:
+    metadata:
+      labels:
+        app: psqlapp
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh","-c","sleep 20 && PGPASSWORD=$POSTGRES_PASSWORD psql -w -d $POSTGRES_DB -U $POSTGRES_USER -c 'CREATE TABLE IF NOT EXISTS counter (id SERIAL PRIMARY KEY,n int);'"]
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: ping
+            - name: POSTGRES_USER
+              value: this
+            - name: POSTGRES_PASSWORD
+              value: this
+          volumeMounts:
+            - name: data
+              mountPath: /data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 100Mi

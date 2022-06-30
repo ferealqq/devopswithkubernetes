@@ -24,10 +24,15 @@ spec:
             - name: shared-image
               mountPath: /opt/app/files
         - name: logreader
-          image: pekkamattinen/logreader:04
+          image: pekkamattinen/logreader:05
           volumeMounts:
             - name: shared-image
               mountPath: /opt/app/files
           env:
           - name: PINGPONG_PORT
             value: "2346"
+          - name: MESSAGE 
+            valueFrom:
+              configMapKeyRef:
+                name: log-map
+                key: MESSAGE

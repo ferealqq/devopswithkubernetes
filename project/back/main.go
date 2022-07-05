@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"project-todo/pkg/db"
 	"project-todo/pkg/models"
 	"project-todo/pkg/util"
 
@@ -55,22 +56,42 @@ func saveTodayImage(){
 }
 
 func main(){
-	var todos []*models.Todo
-	todos = append(todos, models.CreateTodo("Exercise 1.12"), models.CreateTodo("Exrcise 1.13"))
+	db := db.Conn()
+
+	db.AutoMigrate(&models.Todo{})
+	
+	if db.First(&models.Todo{},1).Error != nil {
+		lst := []models.Todo{
+			*models.CreateTodo("Part 2"),
+			*models.CreateTodo("Part 3"),
+		}
+		db.CreateInBatches(lst,2)
+	}
+
 	router := gin.Default()
 	router.Use(util.CORSMiddleware())
 	// this could and should be don with a cron job but we haven't figured out that part yet about kubernetes
 	go saveTodayImage()
 	router.GET("/api/todos", func(c *gin.Context){
-		c.JSON(200, todos)
+		var todos []models.Todo
+		if err := db.Limit(100).Find(&todos).Error; err == nil {
+			c.JSON(200, todos)
+		}else{
+			log.Print(err)
+			c.JSON(500, err.Error())
+		} 
 	})
 	router.POST("/api/todos", func(c *gin.Context){
 		var todo *models.Todo
 		if err := c.BindJSON(&todo); err != nil {
-			c.JSON(500, err.Error())
+			c.JSON(400, err.Error())
 		}else{
-			todos = append(todos, todo)
-			c.JSON(200, todo)
+			if err := db.Create(todo).Error; err == nil {
+				c.JSON(200, todo)
+			}else{
+				log.Print(err)
+				c.JSON(500, err.Error())
+			}
 		}
 	})
 	router.StaticFile("/images/today.png", "images/today.png")

@@ -1,2 +1,5 @@
 vendor
 vendor/
+back/back
+key.txt
+manifests/configmap.yaml

@@ -23,8 +23,11 @@ spec:
           env:
             - name: "PORT"
               value: "3001"
-            - name: CONNECTION
-              value: "host=psql-svc database=ping user=this password=this sslmode=disable"
+            - name: CONNECTION 
+              valueFrom:
+                configMapKeyRef:
+                  name: log-map
+                  key: CONNECTION
           # volumeMounts:
           #   - name: shared-image
           #     mountPath: /opt/app/files

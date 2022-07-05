@@ -24,12 +24,21 @@ spec:
           ports:
             - containerPort: 5432
           env:
-            - name: POSTGRES_DB
-              value: ping
-            - name: POSTGRES_USER
-              value: this
-            - name: POSTGRES_PASSWORD
-              value: this
+            - name: POSTGRES_DB 
+              valueFrom:
+                configMapKeyRef:
+                  name: log-map
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER 
+              valueFrom:
+                configMapKeyRef:
+                  name: log-map
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD 
+              valueFrom:
+                configMapKeyRef:
+                  name: log-map
+                  key: POSTGRES_PASSWORD
           volumeMounts:
             - name: data
               mountPath: /data

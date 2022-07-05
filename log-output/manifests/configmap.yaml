@@ -1,7 +1,0 @@
-apiVersion: v1
-data:
-  MESSAGE: Hello
-kind: ConfigMap
-metadata:
-  name: log-map
-  namespace: logoutput

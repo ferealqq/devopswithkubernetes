@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: daily
+  namespace: project
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: pekkamattinen/project-daily:01
+            env:
+              - name: DB_DSN
+                valueFrom:
+                  configMapKeyRef:
+                    name: project-map
+                    key: DB_DSN
+          restartPolicy: OnFailure # This time we'll run it only once

@@ -19,7 +19,7 @@ spec:
             claimName: image-claim
       containers:
         - name: project-api
-          image: pekkamattinen/api-project:015
+          image: pekkamattinen/api-project:016
           env:
             - name: PORT
               value: "4000"

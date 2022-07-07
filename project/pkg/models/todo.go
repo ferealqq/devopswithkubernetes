@@ -6,7 +6,7 @@ import (
 
 type Todo struct {
 	gorm.Model
-	Name string `json:"name"`
+	Name string `json:"name" gorm:"size:140"`
 	IsCompleted bool `json:"isCompleted" mapstructure:"isCompleted"`
 }
 

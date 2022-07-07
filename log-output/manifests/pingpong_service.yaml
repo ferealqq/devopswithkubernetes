@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: pingpong-svc
+  namespace: logoutput
 spec:
   type: ClusterIP
   selector:

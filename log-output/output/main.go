@@ -1,12 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"math/rand"
 	"os"
-	"strings"
 	"time"
 )
 
@@ -26,31 +24,10 @@ func main(){
 	os.Mkdir("files",0755);
 	for {
 		cur := time.Now().String()+ " : "+ id+"\n"
-		if b,err := os.ReadFile(file); err == nil {
-			s := bytes.NewBuffer(b).String()
-			arr := strings.Split(s, cStr)
-			var out string
-			if len(arr) > 1 { 
-				out = cur+cStr+arr[1]
-			}else if strings.Contains(s, cStr){
-				out = cur+cStr+arr[0]
-			}else{
-				out = cur+cStr+"0"
-			}
-			fmt.Println(out)
-			if e := os.WriteFile(file,[]byte(out), 0644); e != nil {
-				log.Fatal(err.Error())
-			}
-		} else if os.IsNotExist(err) {
-			out := cur+cStr+"0"
-			fmt.Println(out)
-			if e := os.WriteFile(file,[]byte(out), 0644); e != nil {
-				log.Fatal(err.Error())
-			}
-		} else {
-			log.Println(err)
-			log.Fatal(err.Error())
+		if e := os.WriteFile(file, []byte(cur), 0644); e != nil {
+			log.Fatal(e.Error())
 		}
+
 		time.Sleep(5 * time.Second)
 	}	
 }

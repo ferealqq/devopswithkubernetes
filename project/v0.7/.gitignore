@@ -1,5 +1,0 @@
-vendor
-vendor/*
-static/wasm_exec.js
-static/app.wasm
-images/

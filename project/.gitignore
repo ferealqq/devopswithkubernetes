@@ -1,0 +1,6 @@
+vendor
+vendor/
+back/back
+daily/daily
+key.txt
+manifests/configmap.yaml

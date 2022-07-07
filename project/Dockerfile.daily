@@ -1,0 +1,25 @@
+FROM golang:1.18-alpine as build
+
+WORKDIR /app
+
+RUN apk --update add --no-cache ca-certificates openssl git tzdata && \
+update-ca-certificates
+
+COPY go.mod ./
+COPY go.sum ./
+COPY daily ./daily
+COPY pkg ./pkg
+
+RUN go mod download
+
+WORKDIR /app/daily
+
+RUN CGO_ENABLED=0 go build . 
+
+FROM scratch as runner 
+COPY --from=build /app/daily/daily /opt/app/daily
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+WORKDIR /opt/app
+
+CMD [ "./daily" ]

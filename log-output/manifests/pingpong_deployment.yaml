@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pingpong-dep
+  namespace: logoutput
 spec:
   replicas: 1
   selector:
@@ -12,13 +13,21 @@ spec:
       labels:
         app: pingpong
     spec:
-      volumes: # Define volume
-        - name: shared-image
-          persistentVolumeClaim:
-            claimName: logoutput-claim
+      # volumes: # Define volume
+      #   - name: shared-image
+      #     persistentVolumeClaim:
+      #       claimName: logoutput-claim
       containers:
         - name: pingpong
-          image: pekkamattinen/pingpong:03
-          volumeMounts:
-            - name: shared-image
-              mountPath: /opt/app/files
+          image: pekkamattinen/pingpong:07
+          env:
+            - name: "PORT"
+              value: "3001"
+            - name: CONNECTION 
+              valueFrom:
+                configMapKeyRef:
+                  name: log-map
+                  key: CONNECTION
+          # volumeMounts:
+          #   - name: shared-image
+          #     mountPath: /opt/app/files
